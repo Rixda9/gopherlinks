@@ -1,0 +1,16 @@
+# Bin
+api
+
+# Env
+.env 
+
+# go 
+go.sum 
+
+# os 
+.DS_STORE
+
+# logs 
+*.log 
+
+
