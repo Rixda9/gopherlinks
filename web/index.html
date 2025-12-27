@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding-top: 50px; }
+        #shortener-form { display: flex; gap: 10px; width: 100%; max-width: 500px; }
+        #url-input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        #shorten-button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #result-area { margin-top: 20px; padding: 15px; border: 1px dashed #007bff; background-color: #f0f8ff; border-radius: 5px; width: 100%; max-width: 500px; text-align: center; }
+        #result-link { font-weight: bold; color: #28a745; text-decoration: none; }
+        #error-message { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Go URL Shortener</h1>
+    
+    <form id="shortener-form">
+        <input type="text" id="url-input" placeholder="Paste your long link here (e.g., https://example.com/very/long/url)" required>
+        <button type="submit" id="shorten-button">Shorten</button>
+    </form>
+    
+    <div id="result-area" style="display: none;">
+        Your short URL is: <a id="result-link" href="#" target="_blank"></a>
+        <button onclick="copyToClipboard()" style="margin-left: 10px;">Copy</button>
+    </div>
+    
+    <p id="error-message"></p>
+
+    <script>
+        const form = document.getElementById('shortener-form');
+        const input = document.getElementById('url-input');
+        const resultArea = document.getElementById('result-area');
+        const resultLink = document.getElementById('result-link');
+        const errorMessage = document.getElementById('error-message');
+        const baseURL = window.location.origin; // Dynamically get the base URL
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            errorMessage.textContent = '';
+            resultArea.style.display = 'none';
+
+            const longURL = input.value;
+            
+            try {
+                const response = await fetch(baseURL + '/api/shorten', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: longURL })
+                });
+
+                const data = await response.json();
+
+                if (response.status === 201) {
+                    // Success
+                    resultLink.href = data.short_url;
+                    resultLink.textContent = data.short_url;
+                    resultArea.style.display = 'block';
+                } else {
+                    // Failure (Validation Error, etc.)
+                    const errorText = data.error || data || 'Unknown error occurred.'; // Try to get structured error, fall back to text
+                    errorMessage.textContent = 'Error: ' + errorText;
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Network error. Could not connect to the API.';
+                console.error('Fetch error:', error);
+            }
+        });
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(resultLink.textContent).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

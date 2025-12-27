@@ -25,7 +25,19 @@ type ShortenRequest struct {
 type ShortenResponse struct {
 	ShortURL string `json:"short_url"`
 }
-// Shorten the url
+
+// ShortenHandler godoc
+// @Summary      Shorten a URL
+// @Description  Accepts a long URL, validates it, and returns a shortened slug.
+// @Tags         urls
+// @Accept       json
+// @Produce      json
+// @Param        request body ShortenRequest true "URL to shorten"
+// @Success      201  {object}  ShortenResponse
+// @Failure      400  {string}  string  "Invalid request or validation error"
+// @Failure      500  {string}  string  "Internal server error"
+// @Router       /api/shorten [post]
+
 func ShortenHandler(dbRepo repository.Repository, cacheRepo repository.CacheRepository, baseURL string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req ShortenRequest
@@ -59,7 +71,16 @@ func ShortenHandler(dbRepo repository.Repository, cacheRepo repository.CacheRepo
 	}
 }
 
-// Redirect short codes to actual address 
+// RedirectHandler godoc
+// @Summary      Redirect to original URL
+// @Description  Fetches the original URL from Redis or Postgres and redirects the user.
+// @Tags         urls
+// @Param        shortCode   path      string  true  "The 6-character slug"
+// @Success      301  {string}  string  "Redirect to target URL"
+// @Failure      400  {string}  string  "Short code missing"
+// @Failure      404  {string}  string  "Short code not found"
+// @Router       /{shortCode} [get]
+
 func RedirectHandler(dbRepo repository.Repository, cacheRepo repository.CacheRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slug := chi.URLParam(r, "shortCode")
