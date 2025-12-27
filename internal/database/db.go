@@ -19,7 +19,7 @@ func RunMigrations(dbURL string) {
 
 	m, err := migrate.New(sourceURL, dbURL)
 	if err != nil {
-		log.Fatalf("FATAL: Couldnt not create migration instance: %v", err)
+		log.Fatalf("FATAL: Could not create migration instance: %v", err)
 	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
@@ -36,7 +36,7 @@ func RunMigrations(dbURL string) {
 func Connect() *sql.DB {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		log.Fatal("FATAL: DATABSE_URL not set in .env file!")
+		log.Fatal("FATAL: DATABASE_URL not set in .env file!")
 	}
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
