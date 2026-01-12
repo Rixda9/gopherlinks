@@ -1,12 +1,14 @@
-# Bin
-api
-
-# Env
+*.o 
+*.a 
+/main
+*.exe
+*.dll
+*.so 
+*.dylib
 .env 
-
-# go 
-go.sum 
-
+/.env
+.fly/
+*.kate-swp
 # os 
 .DS_STORE
 

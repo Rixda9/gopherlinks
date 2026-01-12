@@ -35,7 +35,7 @@
         const resultArea = document.getElementById('result-area');
         const resultLink = document.getElementById('result-link');
         const errorMessage = document.getElementById('error-message');
-        const baseURL = window.location.origin; // Dynamically get the base URL
+        const baseURL = window.location.origin;
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -54,13 +54,11 @@
                 const data = await response.json();
 
                 if (response.status === 201) {
-                    // Success
                     resultLink.href = data.short_url;
                     resultLink.textContent = data.short_url;
                     resultArea.style.display = 'block';
                 } else {
-                    // Failure (Validation Error, etc.)
-                    const errorText = data.error || data || 'Unknown error occurred.'; // Try to get structured error, fall back to text
+                    const errorText = data.error || data || 'Unknown error occurred.';
                     errorMessage.textContent = 'Error: ' + errorText;
                 }
             } catch (error) {

@@ -5,42 +5,30 @@ import (
 	"net/http"
 
 	httpSwagger "github.com/swaggo/http-swagger"
-  _ "github.com/Rixda9/url-shortener/docs"
+	_ "github.com/Rixda9/url-shortener/docs"
 
-	"github.com/go-chi/chi/v5" 
+	"github.com/go-chi/chi/v5"	
 	"github.com/Rixda9/url-shortener/internal/repository"
 )
 
+
 func NewRouter(postgresRepo *repository.PostgresRepo, redisRepo *repository.RedisRepo, baseURL string) http.Handler {
 	r := chi.NewRouter()
-	
-	type Repos struct {
-		DB repository.Repository
-		Cache repository.CacheRepository
-	}
 
-	repo := Repos{
-		DB: postgresRepo,
-		Cache: redisRepo,
-	}
 
-	// doc route	
 	r.Get("/swagger/*", httpSwagger.Handler(
-        httpSwagger.URL(baseURL + "/swagger/doc.json"), // Points to the generated JSON
-    ))
-	// Public routes 
-	
-	// html for route path
+		httpSwagger.URL(baseURL + "/swagger/doc.json"),
+	))
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "web/index.html")
 	})
- 	// 
-	r.Get("/{shortCode}", RedirectHandler(repo.DB, repo.Cache))
-	//
-	r.Post("/api/shorten", ShortenHandler(repo.DB, repo.Cache, baseURL))
-		
+
+	r.Post("/api/shorten", ShortenHandler(postgresRepo, redisRepo, baseURL))
+
+	r.Get("/{shortCode}", RedirectHandler(postgresRepo, redisRepo))
+
 
 	log.Println("Router endpoints initialized.")
 	return r
 }
-

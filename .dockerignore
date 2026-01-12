@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env
+.env.*
+*.log
+README.md
+docker-compose.yml
+fly.toml
+tmp/
+.vscode/
+.idea/
+.DS_Store
+*.swp

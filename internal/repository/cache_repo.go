@@ -22,9 +22,11 @@ type RedisRepo struct {
 func NewRedisRepo(addr string) *RedisRepo {
 	ctx := context.Background()
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr: addr, 
-	})
+	opt, err := redis.ParseURL(addr)
+	if err != nil {
+		log.Fatalf("FATAL: Could not parse Redis connection URL '%s': %v", addr, err)
+	}
+	rdb := redis.NewClient(opt)
 
 	if _, err := rdb.Ping(ctx).Result(); err != nil {
 		log.Fatalf("Could not connect to Redis: %v", err)
